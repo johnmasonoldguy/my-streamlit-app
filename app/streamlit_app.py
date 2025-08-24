@@ -30,8 +30,6 @@ df = pd.DataFrame({
     "rand": np.random.randn(num_points),
 })
 
-st.write("Test Hackathon App")
-
 st.altair_chart(alt.Chart(df, height=700, width=700)
     .mark_point(filled=True)
     .encode(
