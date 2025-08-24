@@ -1,13 +1,6 @@
 # Streamlit Hackathon Project
 
-## Installation Instructions Mac -Virtual Environment
-
-## local dev - no docker
-
-python3 -m venv .venv
-source .venv/bin/activate
-pip install streamlit
-streamlit hello
+## Installation Instructions
 
 ## Docker
 
