@@ -1,8 +1,12 @@
 # Streamlit Hackathon Project
 
-## Installation Instructions
+Front End for Stream Lit App
 
-## Docker
+
+## Installation Instructions
+### Docker Envrionment
+
+- Local Dev
 
 docker build -t streamlit .
 
