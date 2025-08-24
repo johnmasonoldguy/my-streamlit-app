@@ -2,7 +2,7 @@ import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
-from app.backend.knowledge_base import query_knowledge_base
+from backend.knowledge_base import query_knowledge_base
 
 """
 # Knowledge Database!
