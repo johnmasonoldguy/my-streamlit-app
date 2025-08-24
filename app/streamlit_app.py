@@ -4,11 +4,7 @@ import pandas as pd
 import streamlit as st
 
 """
-<<<<<<< HEAD
 # Welcome to the test app change 2!
-=======
-# Welcome to our Test App!
->>>>>>> main
 
 Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
 If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
