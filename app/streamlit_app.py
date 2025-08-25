@@ -6,7 +6,7 @@ from backend.api import refresh_articles, update_index_with_feedback
 from backend.knowledge_base import query_knowledge_base
 
 """
-# Knowledge Database!
+# “Unified Veterinary Knowledge Assistant”
 """
 
 # Prompt to query the knowledge base
