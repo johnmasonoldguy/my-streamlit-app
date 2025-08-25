@@ -2,7 +2,7 @@ import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
-from app.backend.api import refresh_articles, update_index_with_feedback
+from backend.api import refresh_articles, update_index_with_feedback
 from backend.knowledge_base import query_knowledge_base
 
 """
