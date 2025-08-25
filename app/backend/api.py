@@ -1,62 +1,112 @@
 import openai
-import requests
 import json
+import faiss
+import numpy as np
+from typing import List
 
-import os
-OpenAI = os.environ['OPENAI_KEY']
-kb_api_url = os.environ['KB_API_URL'] 
-kb_api_key = os.environ['KB_API_KEY']
+openai.api_key = "YOUR_OPENAI_API_KEY"
 
-# 1. Configure OpenAI
-openai.api_key = OpenAI
+# ----- Step 1: Sample raw KB data (from earlier) -----
+raw_data = {
+  "articles": [
+    {
+      "id": "A12345",
+      "title": "Vaccine guidelines – Dogs",
+      "body": "Updated March 2022. Puppies should start vaccines at 6–8 weeks. Includes distemper, parvovirus, adenovirus, rabies. Booster every 3 years. Rabies schedule may vary by region."
+    },
+    {
+      "id": "A12346",
+      "title": "Dental cleaning procedure",
+      "body": "Dental cleaning involves: pre-anesthetic bloodwork, anesthesia, ultrasonic scaling, polishing. FAQ: How long does it take? Usually 45–90 minutes."
+    },
+    {
+      "id": "A12347",
+      "title": "Feline Diabetes Mgmt",
+      "body": "Cats with diabetes often present with PU/PD, weight loss, lethargy. Treatment: insulin + dietary control. Monitor blood glucose. Educate owners about hypoglycemia signs."
+    }
+  ]
+}
 
-# 2. Sample function to fetch content from a KB (Neo/Animana API)
-def fetch_kb_content(api_url, api_key):
-    headers = {"Authorization": f"Bearer {api_key}"}
-    response = requests.get(api_url, headers=headers)
-    return response.json()  # assume JSON response with 'articles'
+# ----- Step 2: Create embeddings -----
+def get_embedding(text: str) -> List[float]:
+    response = openai.Embedding.create(
+        input=text,
+        model="text-embedding-3-large"
+    )
+    return response['data'][0]['embedding']
 
-# 3. AI-driven content cleaning & structuring
+# Build vector store (FAISS)
+dimension = 3072  # dimension of text-embedding-3-small
+index = faiss.IndexFlatL2(dimension)
+
+# Store mapping of IDs to embeddings
+id_map = []
+for article in raw_data["articles"]:
+    emb = get_embedding(article["body"])
+    index.add(np.array([emb]).astype('float32'))
+    id_map.append(article["id"])
+
+print(f"Stored {len(id_map)} articles in FAISS index.")
+
+# ----- Step 3: Semantic search -----
+def semantic_search(query: str, top_k: int = 2):
+    q_emb = get_embedding(query)
+    D, I = index.search(np.array([q_emb]).astype('float32'), top_k)
+    results = [raw_data["articles"][i] for i in I[0]]
+    return results
+
+# Example: user query
+query = "best practices for dog vaccinations"
+results = semantic_search(query)
+print("\nTop search results:")
+for r in results:
+    print("-", r["title"])
+
+# ----- Step 4: Clean & structure with GPT -----
 def ai_clean_and_structure(article_text):
     prompt = f"""
-    You are an ETL agent. Analyze the following knowledge base content, 
-    clean it, and convert it into a structured JSON format with:
+    You are an ETL agent. Clean and structure this knowledge base article.
+    Return JSON with:
     - title
     - summary
     - key_entities
     - category
-    - last_updated
-    
-    Content:
+    - last_updated (if found or 'unknown')
+
+    Article:
     {article_text}
     """
-    
     response = openai.ChatCompletion.create(
         model="gpt-4-mini",
         messages=[{"role": "user", "content": prompt}],
         temperature=0
     )
-    
-    # Parse AI output into JSON
-    structured_data = response.choices[0].message.content
-    return json.loads(structured_data)
+    return json.loads(response.choices[0].message.content)
 
-# 4. Example ETL loop
-def etl_pipeline(kb_api_url, kb_api_key):
-    content = fetch_kb_content(kb_api_url, kb_api_key)
-    structured_articles = []
-    
-    for article in content.get("articles", []):
-        structured = ai_clean_and_structure(article.get("body", ""))
-        structured_articles.append(structured)
-    
-    return structured_articles
+structured_output = [ai_clean_and_structure(r["body"]) for r in results]
 
-# 5. Run pipeline
-final_data = etl_pipeline(kb_api_url, kb_api_key)
+print("\n Structured Results:")
+print(json.dumps(structured_output, indent=2))
 
-# 6. Save to JSON or push to enterprise content platform
-with open("structured_kb_data.json", "w") as f:
-    json.dump(final_data, f, indent=2)
 
-print("ETL pipeline completed. Data ready for ingestion.")
+# Example feedback loop update
+def update_index_with_feedback(query, article_id, feedback):
+    if feedback == "helpful":
+        # boost this article's embedding in the index
+        article = [a for a in raw_data["articles"] if a["id"] == article_id][0]
+        emb = get_embedding(article["body"])
+        # add duplicate (or weighted version) to FAISS index
+        index.add(np.array([emb]).astype('float32'))
+    elif feedback == "not_helpful":
+        # log for review
+        flagged_articles.append(article_id)
+
+# Later, you can refresh flagged articles
+def refresh_articles():
+    for aid in flagged_articles:
+        article = [a for a in raw_data["articles"] if a["id"] == aid][0]
+        # Ask GPT to re-clean or enrich metadata
+        improved = ai_clean_and_structure(article["body"])
+        # re-embed and update FAISS
+        emb = get_embedding(improved["summary"])
+        index.add(np.array([emb]).astype('float32'))
