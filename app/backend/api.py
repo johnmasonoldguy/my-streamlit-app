@@ -3,29 +3,14 @@ import json
 import faiss
 import numpy as np
 from typing import List
+import json
 
 openai.api_key = "YOUR_OPENAI_API_KEY"
 
-# ----- Step 1: Sample raw KB data (from earlier) -----
-raw_data = {
-  "articles": [
-    {
-      "id": "A12345",
-      "title": "Vaccine guidelines – Dogs",
-      "body": "Updated March 2022. Puppies should start vaccines at 6–8 weeks. Includes distemper, parvovirus, adenovirus, rabies. Booster every 3 years. Rabies schedule may vary by region."
-    },
-    {
-      "id": "A12346",
-      "title": "Dental cleaning procedure",
-      "body": "Dental cleaning involves: pre-anesthetic bloodwork, anesthesia, ultrasonic scaling, polishing. FAQ: How long does it take? Usually 45–90 minutes."
-    },
-    {
-      "id": "A12347",
-      "title": "Feline Diabetes Mgmt",
-      "body": "Cats with diabetes often present with PU/PD, weight loss, lethargy. Treatment: insulin + dietary control. Monitor blood glucose. Educate owners about hypoglycemia signs."
-    }
-  ]
-}
+import os
+input_path = os.path.join(os.path.dirname(__file__), "input.json")
+with open(input_path, "r", encoding="utf-8") as f:
+    raw_data = json.load(f)
 
 # ----- Step 2: Create embeddings -----
 def get_embedding(text: str) -> List[float]:
