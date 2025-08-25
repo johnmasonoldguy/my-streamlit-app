@@ -5,7 +5,7 @@ import json
 import os
 OpenAI = os.environ['OPENAI_KEY']
 kb_api_url = os.environ['KB_API_URL'] 
-kb_api_key = os.environ['OPENAI_KEY']
+kb_api_key = os.environ['KB_API_KEY']
 
 # 1. Configure OpenAI
 openai.api_key = OpenAI
