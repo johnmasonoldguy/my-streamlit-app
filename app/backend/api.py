@@ -8,8 +8,8 @@ import json
 
 # Use OpenAI API key from environment variable
 import os
-OPENAI_KEY = os.environ["OPENAI_KEY"]
-client = openai.OpenAI(api_key=OPENAI_KEY)
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
 import os
 input_path = os.path.join(os.path.dirname(__file__), "input.json")
