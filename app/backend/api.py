@@ -5,7 +5,11 @@ import numpy as np
 from typing import List
 import json
 
-openai.api_key = "YOUR_OPENAI_API_KEY"
+
+# Use OpenAI API key from environment variable
+import os
+OPENAI_KEY = os.environ["OPENAI_KEY"]
+client = openai.OpenAI(api_key=OPENAI_KEY)
 
 import os
 input_path = os.path.join(os.path.dirname(__file__), "input.json")
@@ -14,11 +18,11 @@ with open(input_path, "r", encoding="utf-8") as f:
 
 # ----- Step 2: Create embeddings -----
 def get_embedding(text: str) -> List[float]:
-    response = openai.Embedding.create(
+    response = client.embeddings.create(
         input=text,
         model="text-embedding-3-large"
     )
-    return response['data'][0]['embedding']
+    return response.data[0].embedding
 
 # Build vector store (FAISS)
 dimension = 3072  # dimension of text-embedding-3-small
