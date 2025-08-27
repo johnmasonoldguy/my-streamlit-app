@@ -3,3 +3,7 @@ pandas
 streamlit
 openai
 faiss-cpu
+pip-system-certs
+certifi>=2023.7.22
+python-dotenv
+httpx>=0.24.0
