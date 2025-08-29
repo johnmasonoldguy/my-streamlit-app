@@ -11,9 +11,9 @@ Backend to hit Zendesk
 docker build -t streamlit .
 
 docker images
-
 docker run -p 8501:8501 streamlit
 docker run -p 8501:8501 -e OPENAI_API_KEY=sk-... streamlit
+
 
 http://0.0.0.0:8501 or http://localhost:8501
 
@@ -32,4 +32,9 @@ Dita Oasis
     <result>The SQLJ file is now ready for use.</result>
   </taskbody>
 </task>
+```
+
+```
+Individual Page Grab - Scarp and convert content to Dita  
+https://idexxneosupport.zendesk.com/hc/en-us/articles/217335177-IDEXX-Neo-Fresh-Start-Implementation-Plan
 ```

@@ -10,4 +10,5 @@ from backend.api import get_embedding, semantic_search
 
 def query_knowledge_base(user_prompt) -> list:
     results = semantic_search(user_prompt)
+    print(f"KB Query Results: {results}")
     return results  
